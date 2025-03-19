@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:roomloo/screens/email_reset_screen.dart';
 
 void showResetPasswordBottomSheet(BuildContext context) {
   showModalBottomSheet(
@@ -37,7 +38,10 @@ void showResetPasswordBottomSheet(BuildContext context) {
               subtitle: 'Reset via Mail Verification.',
               onTap: () {
                 Navigator.pop(context);
-                // Navigate to Email Reset Screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ResetEmailScreen()),
+                );
               },
             ),
             const SizedBox(height: 10),
