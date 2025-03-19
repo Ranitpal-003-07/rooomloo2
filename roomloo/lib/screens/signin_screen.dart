@@ -5,6 +5,7 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:roomloo/screens/signup_screen.dart';
 import 'package:roomloo/widgets/custom_scaffold.dart';
 import 'package:roomloo/themes/theme.dart';
+import 'package:roomloo/widgets/reset_password.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -140,6 +141,9 @@ class _SignInScreenState extends State<SignInScreen> {
                             ],
                           ),
                           GestureDetector(
+                            onTap: () {
+                              showResetPasswordBottomSheet(context);
+                            },
                             child: Text(
                               'Forget password?',
                               style: TextStyle(
