@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:roomloo/screens/email_reset_screen.dart';
+import 'package:roomloo/screens/reset_sms_screen.dart';
 
 void showResetPasswordBottomSheet(BuildContext context) {
   showModalBottomSheet(
@@ -53,9 +54,13 @@ void showResetPasswordBottomSheet(BuildContext context) {
               subtitle: 'Reset via SMS Verification.',
               onTap: () {
                 Navigator.pop(context);
-                // Navigate to SMS Reset Screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ResetSmsScreen()),
+                );
               },
             ),
+
           ],
         ),
       );

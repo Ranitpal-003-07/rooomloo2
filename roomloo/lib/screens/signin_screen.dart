@@ -2,7 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:roomloo/screens/signup_screen.dart';
+import 'package:roomloo/controllers/signin_controller.dart';
+import 'package:roomloo/routes.dart';
 import 'package:roomloo/widgets/custom_scaffold.dart';
 import 'package:roomloo/themes/theme.dart';
 import 'package:roomloo/widgets/reset_password.dart';
@@ -15,8 +16,14 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-  final _formSignInKey = GlobalKey<FormState>();
-  bool rememberPassword = true;
+  final SignInController _controller = SignInController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.loadEmail(); // Load saved email when the screen starts
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
@@ -24,9 +31,7 @@ class _SignInScreenState extends State<SignInScreen> {
         children: [
           const Expanded(
             flex: 1,
-            child: SizedBox(
-              height: 10,
-            ),
+            child: SizedBox(height: 10),
           ),
           Expanded(
             flex: 7,
@@ -41,7 +46,7 @@ class _SignInScreenState extends State<SignInScreen> {
               ),
               child: SingleChildScrollView(
                 child: Form(
-                  key: _formSignInKey,
+                  key: _controller.formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -53,99 +58,58 @@ class _SignInScreenState extends State<SignInScreen> {
                           color: lightColorScheme.primary,
                         ),
                       ),
-                      const SizedBox(
-                        height: 40.0,
-                      ),
+                      const SizedBox(height: 40.0),
                       TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter Email';
-                          }
-                          return null;
-                        },
+                        controller: _controller.emailController,
+                        validator: _controller.validateEmail,
                         decoration: InputDecoration(
                           label: const Text('Email'),
                           hintText: 'Enter Email',
-                          hintStyle: const TextStyle(
-                            color: Colors.black26,
-                          ),
+                          hintStyle: const TextStyle(color: Colors.black26),
                           border: OutlineInputBorder(
-                            borderSide: const BorderSide(
-                              color: Colors.black12, // Default border color
-                            ),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(
-                              color: Colors.black12, // Default border color
-                            ),
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 25.0,
-                      ),
+                      const SizedBox(height: 25.0),
                       TextFormField(
+                        controller: _controller.passwordController,
                         obscureText: true,
-                        obscuringCharacter: '*',
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter Password';
-                          }
-                          return null;
-                        },
+                        validator: _controller.validatePassword,
                         decoration: InputDecoration(
                           label: const Text('Password'),
                           hintText: 'Enter Password',
-                          hintStyle: const TextStyle(
-                            color: Colors.black26,
-                          ),
+                          hintStyle: const TextStyle(color: Colors.black26),
                           border: OutlineInputBorder(
-                            borderSide: const BorderSide(
-                              color: Colors.black12, // Default border color
-                            ),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(
-                              color: Colors.black12, // Default border color
-                            ),
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 25.0,
-                      ),
+                      const SizedBox(height: 25.0),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Row(
                             children: [
                               Checkbox(
-                                value: rememberPassword,
+                                value: _controller.rememberMe,
                                 onChanged: (bool? value) {
                                   setState(() {
-                                    rememberPassword = value!;
+                                    _controller.rememberMe = value ?? false;
                                   });
                                 },
                                 activeColor: lightColorScheme.primary,
                               ),
                               const Text(
                                 'Remember me',
-                                style: TextStyle(
-                                  color: Colors.black45,
-                                ),
+                                style: TextStyle(color: Colors.black45),
                               ),
                             ],
                           ),
                           GestureDetector(
-                            onTap: () {
-                              showResetPasswordBottomSheet(context);
-                            },
+                            onTap: () => showResetPasswordBottomSheet(context),
                             child: Text(
-                              'Forget password?',
+                              'Forgot password?',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: lightColorScheme.primary,
@@ -154,34 +118,15 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(
-                        height: 25.0,
-                      ),
+                      const SizedBox(height: 25.0),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () {
-                            if (_formSignInKey.currentState!.validate() &&
-                                rememberPassword) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Processing Data'),
-                                ),
-                              );
-                            } else if (!rememberPassword) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text(
-                                        'Please agree to the processing of personal data')),
-                              );
-                            }
-                          },
-                          child: const Text('Sign up'),
+                          onPressed: () => _controller.signIn(context),
+                          child: const Text('Sign In'),
                         ),
                       ),
-                      const SizedBox(
-                        height: 25.0,
-                      ),
+                      const SizedBox(height: 25.0),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -192,15 +137,10 @@ class _SignInScreenState extends State<SignInScreen> {
                             ),
                           ),
                           const Padding(
-                            padding: EdgeInsets.symmetric(
-                              vertical: 0,
-                              horizontal: 10,
-                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 10),
                             child: Text(
-                              'Sign up with',
-                              style: TextStyle(
-                                color: Colors.black45,
-                              ),
+                              'Sign in with',
+                              style: TextStyle(color: Colors.black45),
                             ),
                           ),
                           Expanded(
@@ -211,9 +151,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(
-                        height: 25.0,
-                      ),
+                      const SizedBox(height: 25.0),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -223,27 +161,17 @@ class _SignInScreenState extends State<SignInScreen> {
                           Logo(Logos.apple),
                         ],
                       ),
-                      const SizedBox(
-                        height: 25.0,
-                      ),
-                      // don't have an account
+                      const SizedBox(height: 25.0),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text(
                             'Don\'t have an account? ',
-                            style: TextStyle(
-                              color: Colors.black45,
-                            ),
+                            style: TextStyle(color: Colors.black45),
                           ),
                           GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (e) => const SignUpScreen(),
-                                ),
-                              );
+                              Navigator.pushNamed(context, AppRoutes.signUp);
                             },
                             child: Text(
                               'Sign up',
@@ -255,9 +183,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(
-                        height: 20.0,
-                      ),
+                      const SizedBox(height: 20.0),
                     ],
                   ),
                 ),
